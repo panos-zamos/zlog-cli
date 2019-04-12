@@ -1,19 +1,19 @@
 # zlog-cli
 zLog bash scripts
 
-##install
+## install
 
 - copy `lb` and|or `lt` to `~/bin` or make an alias what will execute those scripts
 - make sure you have `~/Dropbox/logbook/` and `~/Dropbox/logtime/` directories
 
-##lb
+## lb
 `lb` _(logbook)_ creates YYYY-MM-DD.md file in `~/Dropbox/logbook/` and opens it in default editor
 
 **options:**
 
 if there is an option `-y` it will open yesterdays file or if it is something else script will offer to create a directory with that name like `lb work` will create file in `~/Dropbox/logbook/work/` (will create that directory for you if it doesn't exists).
 
-##lt
+## lt
 `lt` _(logtime)_ creates YYYY-MM-DD.md file in `~/Dropbox/logtime/` and appends a message to it
 
 **options:**
@@ -26,7 +26,7 @@ _15:23:17 The quick brown fox jumps over the lazy dog_
 
 `lt -e` will open log file in editior
 
-##todo:
+## todo:
 
 - [x] create a repo for `lb` & `lt` scripts
 - [ ] use more from https://github.com/z017/shell-script-skeleton/blob/master/skeleton 
