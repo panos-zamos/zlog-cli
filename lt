@@ -1,0 +1,47 @@
+#!/bin/bash -e
+#
+# zLog - lt (log time):
+# log time create .md file with current Ymd and appends a message to it
+#
+# Copyright (c) 2019 - Panajotis Zamos <panos@holisticagency.com>
+#
+# Built with shell-script-skeleton v0.0.3 <http://github.com/z017/shell-script-skeleton>
+#
+# TODO:
+# - [ ] check default folder if exists
+# - [ ] add -t NN to offset NN minutes
+# - [x] add -e for edit mode --DONE
+# - [ ] add option to less some of the previous days
+# - [ ] handle special characters in arguments `tb cashier upgrade 7 -> 9 and dinner` will echo to file `9`
+
+TILE_N=5
+#RED='\033[0;31m'
+#YELLOW='\033[0;33m'
+#NC='\033[0m' # No Color
+
+folder="/home/$USER/Dropbox/logtime/"
+date_name=$(date '+%Y-%m-%d')
+time_name=$(date '+%T')
+
+ext=".md"
+
+fullname="$folder$date_name$ext"
+
+if [ $1 ] ;then
+    if [ "$1" == -e ];then
+        editor $fullname
+    else
+        echo $time_name $@ >> $fullname
+        tail -n "$TILE_N" "$fullname"
+    fi
+else
+    #read -p 'log: ' log
+    #echo "$time_name $log" >> $fullname
+
+    while IFS= read -p 'log: ' -r log && [ -n "$log" ]; do
+        echo "$time_name $log" >> $fullname
+    done
+
+    echo "============ $fullname ============"
+    tail -n "$TILE_N" "$fullname"
+fi

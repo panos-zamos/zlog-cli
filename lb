@@ -1,0 +1,70 @@
+#!/bin/bash -e
+#
+# zLog - lb (logbook):
+# logbook create .md file with current Ymd and opens it in editor
+#
+# Copyright (c) 2019 - Panajotis Zamos <panos@holisticagency.com>
+#
+# Built with shell-script-skeleton v0.0.3 <http://github.com/z017/shell-script-skeleton>
+#
+# TODO:
+# - [ ] check default folder if exists
+# - [ ] add -m for message (or some other system to add a message in a lb call)
+# - [ ] enable multiple arguments
+
+
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
+folder="/home/$USER/Dropbox/logbook/"
+date_name=$(date '+%Y-%m-%d')
+
+if [ $1 ] ;then
+    if [ "$1" == -y ];then
+        date_name=$(date -d "yesterday 13:00" '+%Y-%m-%d')
+
+    else
+      if [ -d "$folder$1/" ];then
+          folder="$folder$1/"
+      else
+          echo
+          printf "No logbook for ${YELLOW}${1}${NC}, I will create that for you [${YELLOW}$folder$1${NC}]."
+          echo
+          read -p "Do you want to continue? [y/N]" -n 1 -r
+          if [[ $REPLY =~ ^[Yy]$ ]];then
+              echo
+              mkdir -p -- "$folder$1"
+              if [ -d "$folder$1" ]; then
+                  echo
+                  printf "Folder for ${YELLOW}$1${NC} created [${YELLOW}$folder$1${NC}]"
+                  folder="$folder$1/"
+                  echo
+              else
+                  printf "${RED}Fail to create '$folder$1'. Aborting!${NC}"
+                  [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+              fi
+          else
+              echo
+              echo "Abort."
+              [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+          fi
+      fi
+    fi
+fi
+
+#echo -e "\n---------------E-N-D------------------\n\n"
+#[[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+
+ext=".md"
+
+fullname="$folder$date_name$ext"
+
+if [ -e "$fullname" ];then
+    line=$(head -n 1 "$fullname")
+    if [ "$line" ]; then
+        sed -i '1s/^/\n/' $fullname
+    fi
+fi
+
+editor $fullname
