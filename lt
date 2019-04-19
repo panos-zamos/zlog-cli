@@ -14,6 +14,8 @@
 # - [ ] add option to less some of the previous days
 # - [ ] handle special characters in arguments `tb cashier upgrade 7 -> 9 and dinner` will echo to file `9`
 
+readonly SCRIPT_NAME=${0##*/}
+
 TILE_N=5
 #RED='\033[0;31m'
 #YELLOW='\033[0;33m'
@@ -27,9 +29,38 @@ ext=".md"
 
 fullname="$folder$date_name$ext"
 
+
+#######################################
+# help command
+#######################################
+function help_command() {
+  cat <<END;
+USAGE:
+  $SCRIPT_NAME [options] <command>
+OPTIONS:
+  -e                      Edit
+  -l                      List last N
+  -?                      Alias help command
+  --version, -v           Alias version command
+  --force                 Don't ask for confirmation
+  --                      Denotes the end of the options.  Arguments after this
+                          will be handled as parameters even if they start with
+                          a '-'.
+COMMANDS:
+  help                    Display detailed help
+  version                 Print version information.
+END
+  exit 1
+}
+
+
 if [ $1 ] ;then
-    if [ "$1" == -e ];then
+    if [ "$1" == -? ];then
+        help_command
+    elif [ "$1" == -e ];then
         editor $fullname
+    elif [ "$1" == -l ];then
+        tail -n "$TILE_N" "$fullname"
     else
         echo $time_name $@ >> $fullname
         tail -n "$TILE_N" "$fullname"
@@ -45,3 +76,4 @@ else
     echo "============ $fullname ============"
     tail -n "$TILE_N" "$fullname"
 fi
+
