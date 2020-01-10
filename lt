@@ -16,19 +16,18 @@
 
 readonly SCRIPT_NAME=${0##*/}
 
-TILE_N=5
+TILE_N=15
 #RED='\033[0;31m'
 #YELLOW='\033[0;33m'
 #NC='\033[0m' # No Color
 
-folder="/home/$USER/Dropbox/logtime/"
+folder="$HOME/Dropbox/logtime/"
 date_name=$(date '+%Y-%m-%d')
 time_name=$(date '+%T')
 
 ext=".md"
 
 fullname="$folder$date_name$ext"
-
 
 #######################################
 # help command
@@ -39,7 +38,7 @@ USAGE:
   $SCRIPT_NAME [options] <command>
 OPTIONS:
   -e                      Edit
-  -l                      List last N
+  -l                      List last 100 logtimes
   -?                      Alias help command
   --version, -v           Alias version command
   --force                 Don't ask for confirmation
@@ -60,7 +59,7 @@ if [ $1 ] ;then
     elif [ "$1" == -e ];then
         editor $fullname
     elif [ "$1" == -l ];then
-        tail -n "$TILE_N" "$fullname"
+        tail -n 100 "$fullname"
     else
         echo $time_name $@ >> $fullname
         tail -n "$TILE_N" "$fullname"
