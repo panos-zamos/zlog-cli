@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# add to crontab:
+# 0 9-17 * * 1-5 ~/bin/log_ask
+
+date_name=$(date '+%Y-%m-%d')
+time_name=$(date '+%T')
+LOCK_FILE="/tmp/log_ask_$date_name.lock"
+
+#echo "log_ask-ed. ($LOCK_FILE)"
+
+if [ -f "$LOCK_FILE" ]; then
+    echo "log_ask-ed. ($LOCK_FILE)"
+    exit 1
+fi
+
+last=$(~/bin/lt -l|tail -n 1|awk '{$1 = ""; print $0;}'|sed 's/@log_ask//'|awk '{$1=$1}1')
+
+#add lock
+touch $LOCK_FILE
+echo "asked $time_name" >> $LOCK_FILE
+answer=$(zenity --entry --text "what are you doing?" --entry-text "$last" --display=:0.0)
+if [[ "$?" != "0" ]] ; then
+  #echo "cancel"
+  rm $LOCK_FILE
+  exit 1
+fi
+#remove lock
+rm $LOCK_FILE
+
+#TODO:
+# remove lock in case of cancel
+
+#echo "answer is $answer :)"
+
+echo "@log_ask $answer"|~/bin/lt
+
