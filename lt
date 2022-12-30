@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 #
 # zLog - lt (log time):
 # log time create .md file with current Ymd and appends a message to it

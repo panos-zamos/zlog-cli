@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 #
 # zLog - lb (logbook):
 # logbook create .md file with current Ymd and opens it in editor
@@ -18,30 +18,59 @@ YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
 
 folder="/home/$USER/Dropbox/logbook/"
+main_tag=""
 date_name=$(date '+%Y-%m-%d')
+name_suffix=''
 
-if [ $1 ] ;then
-    if [ "$1" == -y ];then
-        date_name=$(date -d "yesterday 13:00" '+%Y-%m-%d')
+############################################################
+# Process the input options. Add options as needed.        #
+#   from: https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash#answer-33826763
+############################################################
 
-    else
-      if [ -d "$folder$1/" ];then
-          folder="$folder$1/"
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -y) date_name=$(date -d "yesterday 13:00" '+%Y-%m-%d'); y=1 ;;
+        -yy) date_name=$(date -d "-2 day 13:00" '+%Y-%m-%d'); y=2 ;;
+        -n|--name) name_suffix="$2"; shift ;;
+        *) main_tag="$1"
+        # *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+############################################################
+# Main program                                             #
+############################################################
+
+# if [ $2 ] ;then
+#     if [ "$2" == -y ];then
+#         date_name=$(date -d "yesterday 13:00" '+%Y-%m-%d')
+#         in_place='if 2'
+#     fi
+# fi
+
+# if [ $1 ] ;then
+#     if [ "$1" == -y ];then
+#         date_name=$(date -d "yesterday 13:00" '+%Y-%m-%d')
+#         in_place="if 1"
+#     else
+      if [ -d "$folder$main_tag/" ];then
+          folder="$folder$main_tag/"
       else
           echo
-          printf "No logbook for ${YELLOW}${1}${NC}, I will create that for you [${YELLOW}$folder$1${NC}]."
+          printf "No logbook for ${YELLOW}${main_tag}${NC}, I will create that for you [${YELLOW}$folder$main_tag${NC}]."
           echo
           read -p "Do you want to continue? [y/N]" -n 1 -r
           if [[ $REPLY =~ ^[Yy]$ ]];then
               echo
-              mkdir -p -- "$folder$1"
-              if [ -d "$folder$1" ]; then
+              mkdir -p -- "$folder$main_tag"
+              if [ -d "$folder$main_tag" ]; then
                   echo
-                  printf "Folder for ${YELLOW}$1${NC} created [${YELLOW}$folder$1${NC}]"
-                  folder="$folder$1/"
+                  printf "Folder for ${YELLOW}$main_tag${NC} created [${YELLOW}$folder$main_tag${NC}]"
+                  folder="$folder$main_tag/"
                   echo
               else
-                  printf "${RED}Fail to create '$folder$1'. Aborting!${NC}"
+                  printf "${RED}Fail to create '$folder$main_tag'. Aborting!${NC}"
                   [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
               fi
           else
@@ -50,21 +79,29 @@ if [ $1 ] ;then
               [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
           fi
       fi
-    fi
-fi
+#     fi
+# fi
 
 #echo -e "\n---------------E-N-D------------------\n\n"
 #[[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
 
 ext=".md"
 
-fullname="$folder$date_name$ext"
+fullname="$folder$date_name$name_suffix$ext"
 
 if [ -e "$fullname" ];then
     line=$(head -n 1 "$fullname")
     if [ "$line" ]; then
         sed -i '1s/^/\n/' $fullname
     fi
+else
+    touch $fullname
 fi
 
+#echo "in place: $date_name"
+#echo "fullname: $fullname"
+#echo "name_suffix: $name_suffix"
+#echo "all args: $0"
+
 editor $fullname
+
